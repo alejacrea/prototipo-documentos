@@ -36,6 +36,8 @@
     --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px;
     --radius-md:12px; --radius-full:999px;
     --touch-min:44px;
+    --page-bg:#F2F2F2;       /* neutral/100: fondo de página en escritorio */
+    --device-bezel:#1A1A1A;  /* neutral/900: bisel decorativo del marco */
   }
   *{box-sizing:border-box}
   html{scroll-padding-bottom:132px}
@@ -128,6 +130,18 @@
   /* Con zoom alto (poca altura útil) la barra deja de ser fija para no tapar contenido */
   @media (max-height:500px){.form-actions{position:static}}
 
+  /* Marco de celular decorativo, solo en pantallas de más de 480 px.
+     En 480 px o menos no hay marco: .device no tiene estilos y .device-frame no se muestra. */
+  .device-frame{display:none}
+  @media (min-width:481px){
+    html{scroll-padding-bottom:0}
+    body{background:var(--page-bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .device{position:relative;flex:none;width:414px;height:min(868px,calc(100vh - 48px));height:min(868px,calc(100dvh - 48px));min-height:560px;padding:12px}
+    .device-frame{display:block;position:absolute;inset:0;border:12px solid var(--device-bezel);border-radius:48px;pointer-events:none}
+    .device .screen{width:390px;max-width:none;height:100%;min-height:0;margin:0;border-radius:36px;overflow-x:hidden;overflow-y:auto;scroll-padding-bottom:132px}
+    .device .screen > *{flex-shrink:0}
+  }
+
   /* Movimiento */
   .spin{animation:spin 1s linear infinite;transform-origin:50% 50%}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -139,6 +153,8 @@
 </style>
 </head>
 <body>
+<div class="device">
+<div class="device-frame" aria-hidden="true"></div>
 <div class="screen">
   <header class="header">
     <button type="button" class="btn-text body-small-em">
@@ -172,6 +188,7 @@
     <button type="button" class="btn primary label-base" id="continue">Continuar</button>
     <button type="button" class="btn secondary label-base">Guardar y seguir después</button>
   </div>
+</div>
 </div>
 
 <script>
