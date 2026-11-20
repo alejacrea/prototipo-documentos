@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="es-CO">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tus documentos | Credibanco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Tokens tomados del frame "Make / Documentos / Mobile / Estado inicial" (107:641) y de UI-Kit */
+  :root{
+    --surface-default:#FFFFFF;   /* surface/default */
+    --surface-disabled:#F2F2F2;  /* surface/disabled */
+    --surface-error:#FDECEA;     /* surface/error */
+    --text-default:#4D4851;      /* text/default */
+    --text-strong:#2D2D2D;       /* text/strong */
+    --text-secondary:#666666;    /* text/secondary */
+    --text-link:#007A77;         /* text/link */
+    --text-on-primary:#1A1A1A;   /* text/on-primary */
+    --text-error:#B3261E;        /* text/error */
+    --text-success:#1B7F4B;      /* text/success */
+    --border-input:#767676;      /* border/input */
+    --border-subtle:#8A8A8A;     /* border/subtle */
+    --border-divider:#D9D9D9;    /* border/divider */
+    --border-error:#B3261E;      /* border/error */
+    --border-focus:#007A77;      /* border/focus */
+    --action-primary:#FFC600;    /* action/primary */
+    --tonal-surface:#E6F7F6;     /* action/tonal-surface */
+    --tonal-icon:#007A77;        /* action/tonal-icon */
+    --danger-surface:#FDECEA;    /* action/danger-surface */
+    --danger-icon:#B3261E;       /* action/danger-icon */
+    --accent-brand:#00AFAA;      /* accent/brand */
+    --accent-strong:#007A77;     /* accent/strong */
+    --shadow-card:rgba(0,0,0,.12); /* shadow/card */
+    --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px;
+    --radius-md:12px; --radius-full:999px;
+    --touch-min:44px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-padding-bottom:132px}
+  body{margin:0;background:var(--surface-default);font-family:Montserrat,sans-serif;color:var(--text-default);-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:0;cursor:pointer}
+  svg{display:block;flex:none}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+  /* Foco visible: anillo de 2 px en border/focus con 2 px de separación */
+  :focus{outline:none}
+  :focus-visible{outline:2px solid var(--border-focus);outline-offset:2px}
+
+  /* Tipografía (estilos de texto del sistema) */
+  .body-small{font-size:14px;line-height:20px;font-weight:400}
+  .body-small-em{font-size:14px;line-height:20px;font-weight:600}
+  .label-base{font-size:16px;line-height:24px;font-weight:600}
+
+  .screen{width:100%;max-width:390px;margin:0 auto;background:var(--surface-default);display:flex;flex-direction:column;min-height:100vh}
+
+  /* Header Mobile: 390 x 60, padding space/2, gap space/2, borde inferior border/divider */
+  .header{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-2) 7px;min-height:60px;border-bottom:1px solid var(--border-divider);background:var(--surface-default)}
+  .btn-text{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:var(--touch-min);min-width:var(--touch-min);padding:var(--space-2) var(--space-5);border-radius:var(--radius-full);color:var(--text-link);flex:none}
+  .header h1{flex:1 0 auto;margin:0;text-align:center;font-size:16px;line-height:24px;font-weight:600;color:var(--text-strong)}
+  /* Espacio de equilibrio para centrar el título: se encoge primero en pantallas angostas (reflujo a 320 px) */
+  .header .balance{flex:0 1 104px;min-width:0;height:44px}
+
+  .content{display:flex;flex-direction:column;gap:var(--space-5);padding:var(--space-5) var(--space-4)}
+
+  /* Progress Mobile */
+  .progress{display:flex;flex-direction:column;gap:var(--space-2)}
+  .progress .row{display:flex;justify-content:space-between;align-items:center}
+  .progress .label{color:var(--text-secondary)}
+  .progress .count{color:var(--text-strong)}
+  .segments{display:flex;gap:var(--space-1)}
+  .segments span{flex:1;height:8px;border-radius:var(--radius-full);background:var(--surface-disabled)}
+  .segments span.done{background:var(--accent-brand)}
+
+  /* Error summary Mobile */
+  .error-summary{display:flex;align-items:center;gap:var(--space-2);padding:15px;background:var(--surface-error);border:1px solid var(--border-error);border-radius:var(--radius-md);color:var(--text-error);min-height:48px}
+  .error-summary[hidden]{display:none}
+  .error-summary p{margin:0;flex:1}
+
+  .documents{display:flex;flex-direction:column;gap:var(--space-4)}
+
+  /* Document card: borde interior de 1 px (2 px en error) sin mover el contenido */
+  .card{display:flex;flex-direction:column;gap:var(--space-3);padding:15px;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--surface-default)}
+  .card[data-state="empty"]{align-items:center;text-align:center}
+  .card[data-state="error"]{border:2px solid var(--border-error);padding:14px}
+  .title-row{display:flex;align-items:center;gap:var(--space-1);flex-wrap:wrap}
+  .title-row .title{margin:0;color:var(--text-strong)}
+  .title-row .optional{color:var(--text-secondary)}
+  .card[data-state="empty"] .title-row{justify-content:center}
+  .help{margin:0;color:var(--text-default)}
+
+  .btn-secondary{display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);min-height:var(--touch-min);padding:7px 23px;border:1px solid var(--border-input);border-radius:var(--radius-full);background:var(--surface-default);color:var(--text-strong)}
+
+  .file-row{display:flex;align-items:center;gap:var(--space-3);width:100%}
+  .file-row .file-icon{color:var(--text-strong)}
+  .file-details{flex:1;min-width:0;display:flex;flex-direction:column}
+  .file-name{color:var(--text-default);overflow-wrap:anywhere}
+  .file-meta{display:flex;align-items:center;gap:var(--space-2)}
+  .file-size{color:var(--text-secondary)}
+  .status{display:inline-flex;align-items:center;gap:var(--space-1)}
+  .status.success{color:var(--text-success)}
+  .file-actions{display:flex;gap:var(--space-3);flex:none}
+
+  /* Icon Button 44 x 44 circular */
+  .icon-btn{width:var(--touch-min);height:var(--touch-min);border-radius:var(--radius-full);display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .icon-btn.subtle{background:transparent;color:var(--text-strong)}
+  .icon-btn.tonal{background:var(--tonal-surface);color:var(--tonal-icon)}
+  .icon-btn.danger{background:var(--danger-surface);color:var(--danger-icon)}
+
+  .status-row{display:flex;justify-content:space-between;align-items:center;width:100%}
+  .status-row .uploading{color:var(--text-default)}
+  .status-row .loader{color:var(--accent-strong)}
+  .status-row .percent{color:var(--text-secondary)}
+  .bar{width:100%;height:8px;border-radius:var(--radius-full);background:var(--surface-disabled);overflow:hidden}
+  .bar-fill{height:100%;width:0;border-radius:var(--radius-full);background:var(--accent-strong)}
+
+  .field-error{display:flex;gap:var(--space-1);width:100%}
+  .field-error .icon-slot{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text-error);flex:none}
+  .field-error .message{margin:0;color:var(--text-error)}
+  .field-error .suggestion{margin:0;color:var(--text-default)}
+
+  /* Form actions Stacked: barra fija al borde inferior con elevation/bar-top */
+  .form-actions{position:sticky;bottom:0;margin-top:auto;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-4);background:var(--surface-default);box-shadow:0 -2px 8px 0 var(--shadow-card)}
+  .btn{display:flex;align-items:center;justify-content:center;gap:var(--space-2);width:100%;min-height:var(--touch-min);padding:var(--space-2) var(--space-5);border-radius:var(--radius-full)}
+  .btn.primary{background:var(--action-primary);color:var(--text-on-primary)}
+  .btn.secondary{background:var(--surface-default);color:var(--text-strong);border:1px solid var(--border-input);padding:7px 23px}
+  /* Con zoom alto (poca altura útil) la barra deja de ser fija para no tapar contenido */
+  @media (max-height:500px){.form-actions{position:static}}
+
+  /* Movimiento */
+  .spin{animation:spin 1s linear infinite;transform-origin:50% 50%}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pop{animation:pop .2s ease-out}
+  @keyframes pop{from{transform:scale(.6)}to{transform:scale(1)}}
+  @media (prefers-reduced-motion:reduce){
+    .spin,.pop{animation:none}
+  }
+</style>
+</head>
+<body>
+<div class="screen">
+  <header class="header">
+    <button type="button" class="btn-text body-small-em">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M13 8H3M6.75 4L3 8L6.75 12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>
+      Atrás
+    </button>
+    <h1>Tus documentos</h1>
+    <span class="balance" aria-hidden="true"></span>
+  </header>
+
+  <main class="content" id="main">
+    <div class="progress">
+      <div class="row" aria-hidden="true">
+        <span class="label body-small">Progreso</span>
+        <span class="count body-small-em">3 de 5</span>
+      </div>
+      <div class="segments" role="progressbar" aria-label="Progreso" aria-valuemin="1" aria-valuemax="5" aria-valuenow="3" aria-valuetext="Paso 3 de 5"><span class="done"></span><span class="done"></span><span class="done"></span><span></span><span></span></div>
+    </div>
+
+    <div class="error-summary" id="error-summary" tabindex="-1" hidden>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 1.875C5.51268 1.875 1.875 5.51268 1.875 10C1.875 14.4873 5.51268 18.125 10 18.125C14.4873 18.125 18.125 14.4873 18.125 10C18.125 5.51268 14.4873 1.875 10 1.875ZM10 5.73059C10.3452 5.73059 10.625 6.01042 10.625 6.35559V10.9389C10.625 11.2841 10.3452 11.5639 10 11.5639C9.65483 11.5639 9.375 11.2841 9.375 10.9389V6.35559C9.375 6.01042 9.65483 5.73059 10 5.73059ZM10.625 13.2277V13.6444C10.625 13.9896 10.3452 14.2694 10 14.2694C9.65483 14.2694 9.375 13.9896 9.375 13.6444V13.2277C9.375 12.8826 9.65483 12.6027 10 12.6027C10.3452 12.6027 10.625 12.8826 10.625 13.2277Z" fill="currentColor"/></svg>
+      <p class="body-small-em" id="error-summary-text"></p>
+    </div>
+
+    <div class="documents" id="documents"></div>
+
+    <div class="sr-only" aria-live="polite" id="live"></div>
+  </main>
+
+  <div class="form-actions">
+    <button type="button" class="btn primary label-base" id="continue">Continuar</button>
+    <button type="button" class="btn secondary label-base">Guardar y seguir después</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  // Íconos MynaUI exportados de UI-Kit (trazo 1.5, color por currentColor)
+  var ICON = {
+    upload:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.66666 10.6695V11.3333C2.66666 12.4379 3.5621 13.3333 4.66666 13.3333H11.3333C12.4379 13.3333 13.3333 12.4379 13.3333 11.3333V10.6667" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M8 10.3333V3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M10.3333 5.33333L8 3L5.66666 5.33333" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>',
+    file:'<svg class="file-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9.72796 3H7.5C6.25736 3 5.25 4.00736 5.25 5.25V18.75C5.25 19.9926 6.25736 21 7.5 21H16.5C17.7426 21 18.75 19.9926 18.75 18.75V12M9.72796 3C10.9706 3 12 4.00736 12 5.25V7.5C12 8.74264 13.0074 9.75 14.25 9.75H16.5C17.7426 9.75 18.75 10.7574 18.75 12M9.72796 3C13.4179 3 18.75 8.3597 18.75 12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>',
+    close:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6.00005L6 18M5.99995 6L17.9999 18" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>',
+    loader:'<svg class="loader spin" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 2V4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M12.2437 3.75616L10.8312 5.16866" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M14 8H12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M12.2437 12.2437L10.8312 10.8312" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M8 14V12" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M3.75626 12.2437L5.16876 10.8312" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M2 8H4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M3.75626 3.75616L5.16876 5.16866" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>',
+    check:'<svg class="pop" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M1.5 8C1.5 4.41015 4.41015 1.5 8 1.5C11.5899 1.5 14.5 4.41015 14.5 8C14.5 11.5899 11.5899 14.5 8 14.5C4.41015 14.5 1.5 11.5899 1.5 8ZM10.515 5.79466C10.2911 5.63298 9.9786 5.68339 9.81693 5.90725L7.41853 9.22807C7.3558 9.315 7.2286 9.32093 7.158 9.24027L6.15413 8.093C5.97229 7.88513 5.65641 7.86407 5.44859 8.04593C5.24077 8.2278 5.21971 8.54367 5.40155 8.75147L6.40543 9.8988C6.8994 10.4633 7.79007 10.4217 8.22927 9.8136L10.6276 6.49274C10.7893 6.26888 10.7389 5.95634 10.515 5.79466Z" fill="currentColor"/></svg>',
+    trash:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 9L17.1602 17.398C17.0329 18.6705 16.9693 19.3068 16.6805 19.7875C16.4261 20.2109 16.052 20.5495 15.6054 20.7605C15.0983 21 14.4589 21 13.18 21H10.8199C9.54109 21 8.90166 21 8.39459 20.7605C7.94798 20.5495 7.57387 20.2109 7.31949 19.7875C7.03068 19.3068 6.96705 18.6705 6.8398 17.398L6 9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M13.5 15.5V10.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M10.5 15.5V10.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M4.5 6.5H9.11539M9.11539 6.5L9.50112 3.82848C9.61348 3.34157 10.0173 3 10.4806 3H13.5194C13.9827 3 14.3865 3.34158 14.4989 3.82848L14.8846 6.5M9.11539 6.5H14.8846M14.8846 6.5H19.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>',
+    refresh:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 8C19.1077 4.82137 15.6774 3 11.9777 3C7.29934 3 3.45266 6.55201 3 11.1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M16.4888 8.3999H20.4586C20.7576 8.3999 20.9999 8.15814 20.9999 7.8599V3.8999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M3.5 15.9999C4.89224 19.1785 8.32256 20.9999 12.0223 20.9999C16.7006 20.9999 20.5473 17.4479 20.9999 12.8999" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M7.51112 15.6001H3.54133C3.24236 15.6001 3 15.8418 3 16.1401V20.1001" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>',
+    alert16:'<svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 1.5C4.41015 1.5 1.5 4.41015 1.5 8C1.5 11.5899 4.41015 14.5 8 14.5C11.5899 14.5 14.5 11.5899 14.5 8C14.5 4.41015 11.5899 1.5 8 1.5ZM8 4.58447C8.27613 4.58447 8.5 4.80833 8.5 5.08447V8.75113C8.5 9.02727 8.27613 9.25113 8 9.25113C7.72387 9.25113 7.5 9.02727 7.5 8.75113V5.08447C7.5 4.80833 7.72387 4.58447 8 4.58447ZM8.5 10.5822V10.9155C8.5 11.1917 8.27613 11.4155 8 11.4155C7.72387 11.4155 7.5 11.1917 7.5 10.9155V10.5822C7.5 10.3061 7.72387 10.0822 8 10.0822C8.27613 10.0822 8.5 10.3061 8.5 10.5822Z" fill="currentColor"/></svg>'
+  };
+
+  // Documentos: textos del frame Make; archivos y pesos son datos de ejemplo
+  var DOCS = [
+    {id:'rut',   title:'RUT (Registro Único Tributario)', optional:false, upload:'Subir RUT',         short:'el RUT', of:'del RUT',                         file:'rut-comercio.pdf',          size:'2 MB',  failAt:null},
+    {id:'cert',  title:'Certificado bancario',            optional:false, upload:'Subir certificado', short:'el certificado bancario', of:'del certificado bancario',        file:'certificado-bancario.pdf',  size:'12 MB', failAt:null},
+    {id:'foto',  title:'Foto del establecimiento',        optional:true,  upload:'Subir foto',        short:'la foto del establecimiento', of:'de la foto del establecimiento',    file:'foto-local.jpeg',           size:'12 MB', failAt:60}
+  ];
+  var HELP = 'JPEG, PNG o PDF, hasta 20 MB';
+  var DURATION = 3000;
+  var state = {};
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var list = document.getElementById('documents');
+  var live = document.getElementById('live');
+  var summary = document.getElementById('error-summary');
+  var summaryText = document.getElementById('error-summary-text');
+
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function announce(msg){ live.textContent=''; window.setTimeout(function(){ live.textContent=msg; }, 50); }
+  function ease(t){ return t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2; } // curva suave (ease-in-out cúbica)
+
+  function titleRow(d){
+    return '<div class="title-row"><h2 class="title body-small-em" id="t-'+d.id+'">'+esc(d.title)+'</h2>'+
+      (d.optional?'<span class="optional body-small">(opcional)</span>':'')+'</div>';
+  }
+
+  function render(d){
+    var s = state[d.id], li = document.getElementById('card-'+d.id), html;
+    if(s.status==='empty'){
+      html = titleRow(d)+
+        '<p class="help body-small" id="h-'+d.id+'">'+HELP+'</p>'+
+        '<button type="button" class="btn-secondary body-small-em" data-act="upload" aria-describedby="h-'+d.id+'">'+ICON.upload+esc(d.upload)+'</button>';
+    } else if(s.status==='uploading'){
+      html = titleRow(d)+
+        '<div class="file-row">'+ICON.file+
+          '<div class="file-details"><span class="file-name body-small">'+esc(d.file)+'</span></div>'+
+          '<div class="file-actions"><button type="button" class="icon-btn subtle" data-act="cancel" aria-label="Cancelar la carga '+esc(d.of)+'">'+ICON.close+'</button></div>'+
+        '</div>'+
+        '<div class="status-row"><span class="status"><span class="loader-wrap">'+ICON.loader.replace('class="loader spin"', reduce.matches?'class="loader"':'class="loader spin"')+'</span><span class="uploading body-small-em">Subiendo</span></span>'+
+          '<span class="percent body-small" aria-hidden="true" data-percent>0 %</span></div>'+
+        '<div class="bar" role="progressbar" aria-label="Carga de '+esc(d.file)+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar-fill"></div></div>';
+    } else if(s.status==='uploaded'){
+      html = titleRow(d)+
+        '<div class="file-row">'+ICON.file+
+          '<div class="file-details"><span class="file-name body-small">'+esc(d.file)+'</span>'+
+            '<span class="file-meta"><span class="file-size body-small">'+esc(d.size)+'</span>'+
+            '<span class="status success">'+(reduce.matches?ICON.check.replace('class="pop"',''):ICON.check)+'<span class="body-small-em">Subido</span></span></span></div>'+
+          '<div class="file-actions"><button type="button" class="icon-btn danger" data-act="delete" aria-label="Eliminar '+esc(d.short)+'">'+ICON.trash+'</button></div>'+
+        '</div>';
+    } else { // error
+      html = titleRow(d)+
+        '<div class="file-row">'+ICON.file+
+          '<div class="file-details"><span class="file-name body-small">'+esc(d.file)+'</span>'+
+            '<span class="file-meta"><span class="file-size body-small">'+esc(d.size)+'</span></span></div>'+
+          '<div class="file-actions">'+
+            '<button type="button" class="icon-btn tonal" data-act="retry" aria-label="Reintentar la carga '+esc(d.of)+'" aria-describedby="e-'+d.id+'">'+ICON.refresh+'</button>'+
+            '<button type="button" class="icon-btn danger" data-act="delete" aria-label="Eliminar '+esc(d.short)+'">'+ICON.trash+'</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="field-error" id="e-'+d.id+'"><span class="icon-slot">'+ICON.alert16+'</span>'+
+          '<div><p class="message body-small-em"><span class="sr-only">Error: </span>Se interrumpió la carga</p><p class="suggestion body-small">Revisa tu conexión</p></div></div>';
+    }
+    li.dataset.state = s.status;
+    li.innerHTML = html;
+  }
+
+  function focusIn(d, act){
+    var b = document.querySelector('#card-'+d.id+' [data-act="'+act+'"]');
+    if(b) b.focus();
+  }
+
+  function setProgress(d, p){
+    var li = document.getElementById('card-'+d.id);
+    var bar = li.querySelector('[role="progressbar"]'); if(!bar) return;
+    var v = Math.round(p);
+    bar.setAttribute('aria-valuenow', v);
+    li.querySelector('.bar-fill').style.width = p+'%';
+    li.querySelector('[data-percent]').textContent = v+' %';
+  }
+
+  function startUpload(d, allowFail){
+    var s = state[d.id];
+    var hadFocus = document.getElementById('card-'+d.id).contains(document.activeElement);
+    s.status = 'uploading'; s.announced = {}; s.token = (s.token||0)+1;
+    var token = s.token, failAt = allowFail ? d.failAt : null;
+    render(d); updateSummary();
+    if(hadFocus) focusIn(d,'cancel');
+    var t0 = performance.now();
+    function step(now){
+      if(state[d.id].token!==token || state[d.id].status!=='uploading') return;
+      var t = Math.min(1, Math.max(0,(now-t0)/DURATION)), p = ease(t)*100;
+      if(reduce.matches){ p = Math.floor(p/25)*25; } // sin movimiento continuo: avanza en saltos de 25 %
+      if(failAt!==null && ease(t)*100>=failAt){ setProgress(d, reduce.matches ? Math.floor(failAt/25)*25 : failAt); fail(d); return; }
+      setProgress(d,p);
+      [25,50,75].forEach(function(m){ if(ease(t)*100>=m && !s.announced[m]){ s.announced[m]=true; announce(d.title+': subiendo, '+m+' %'); } });
+      if(t>=1){ complete(d); return; }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function complete(d){
+    var s = state[d.id], hadFocus = document.getElementById('card-'+d.id).contains(document.activeElement);
+    s.status = 'uploaded'; s.failed = false;
+    render(d); updateSummary();
+    announce(d.title+': 100 %, subido');
+    if(hadFocus) focusIn(d,'delete');
+  }
+
+  function fail(d){
+    var s = state[d.id], hadFocus = document.getElementById('card-'+d.id).contains(document.activeElement);
+    s.status = 'error'; s.failed = true;
+    render(d); updateSummary();
+    announce(d.title+': error. Se interrumpió la carga. Revisa tu conexión.');
+    if(hadFocus) focusIn(d,'retry');
+  }
+
+  function reset(d, msg){
+    var s = state[d.id], hadFocus = document.getElementById('card-'+d.id).contains(document.activeElement);
+    s.status = 'empty'; s.token = (s.token||0)+1;
+    render(d); updateSummary();
+    announce(msg);
+    if(hadFocus) focusIn(d,'upload');
+  }
+
+  // Reglas del resumen (CLAUDE.md, "Error summary: reglas del texto")
+  function summaryMessage(){
+    var missing = DOCS.filter(function(d){ return !d.optional && state[d.id].status!=='uploaded'; }).length;
+    var optionalErrors = DOCS.filter(function(d){ return d.optional && state[d.id].status==='error'; }).length;
+    if(missing===0) return null; // solo falla un opcional o no falta nada: no bloquea Continuar
+    if(optionalErrors>0) return (missing+optionalErrors)+' documentos con error. Corrige '+missing+' para continuar.';
+    return 'Corrige '+missing+(missing===1?' documento':' documentos')+' para continuar';
+  }
+  function updateSummary(){
+    if(summary.hidden) return;
+    var msg = summaryMessage();
+    if(msg===null){ summary.hidden = true; return; }
+    summaryText.textContent = msg;
+  }
+
+  // Construcción inicial
+  DOCS.forEach(function(d){
+    state[d.id] = {status:'empty', failed:false};
+    var li = document.createElement('div');
+    li.className = 'card'; li.id = 'card-'+d.id;
+    li.setAttribute('role','group'); li.setAttribute('aria-labelledby','t-'+d.id);
+    list.appendChild(li);
+    render(d);
+  });
+
+  list.addEventListener('click', function(e){
+    var b = e.target.closest('[data-act]'); if(!b) return;
+    var li = b.closest('.card'), d = DOCS.filter(function(x){ return 'card-'+x.id===li.id; })[0];
+    var act = b.getAttribute('data-act');
+    if(act==='upload') startUpload(d, !state[d.id].failed);
+    else if(act==='retry') startUpload(d, false);
+    else if(act==='cancel') reset(d, 'Carga de '+d.title+' cancelada');
+    else if(act==='delete') reset(d, d.title+' eliminado');
+  });
+
+  document.getElementById('continue').addEventListener('click', function(){
+    var msg = summaryMessage();
+    if(msg===null){ summary.hidden = true; return; }
+    summaryText.textContent = msg;
+    summary.hidden = false;
+    summary.focus();
+  });
+})();
+</script>
+</body>
+</html>
